@@ -6,7 +6,7 @@
 /*   By: agallipo <agallipo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/01 12:39:26 by agallipo          #+#    #+#             */
-/*   Updated: 2021/12/01 20:43:23 by agallipo         ###   ########.fr       */
+/*   Updated: 2021/12/02 13:02:28 by agallipo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,10 @@ typedef struct s_mlx
 {
 	void	*ptr;
 	void	*window;
+	int		width;
+	int		height;
+	char	*name;
+
 }				t_mlx;
 typedef struct s_elem
 {
@@ -39,7 +43,7 @@ typedef struct s_data
 	int		i;
 	int		j;
 }				t_data;
-void	ft_create_map(char **argv);
+t_data	ft_create_map(char **argv);
 void	ft_check_map(char	**map, t_data *smth);
 int		ft_condition(t_elem *ent,  char  c);
 void	ft_fill_map(char **map, t_data *smth);

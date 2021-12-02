@@ -6,7 +6,7 @@
 #    By: agallipo <agallipo@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/12/01 12:16:29 by agallipo          #+#    #+#              #
-#    Updated: 2021/12/01 20:40:38 by agallipo         ###   ########.fr        #
+#    Updated: 2021/12/02 13:07:59 by agallipo         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,7 @@ OBJS =  ${SRCS:.c=.o}
 LIBFTDIR = libft/
 NAME = so_long
 CC = gcc
-FLAGS = -Wall -Werror -Wextra -g
+FLAGS =  -g -lmlx -framework OpenGL -framework AppKit
 RM = rm -f
 
 all: 	${NAME}

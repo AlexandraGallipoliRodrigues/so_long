@@ -6,7 +6,7 @@
 /*   By: agallipo <agallipo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/01 18:38:24 by agallipo          #+#    #+#             */
-/*   Updated: 2021/12/01 20:49:08 by agallipo         ###   ########.fr       */
+/*   Updated: 2021/12/02 13:02:16 by agallipo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@ void	ft_free_all(char **map, int i)
 		i--;
 	}
 	free(map);
-	printf("HOLA");
-	system("leaks so_long");
+	printf("ERROR\n");
+	//system("leaks so_long");
 	exit (0);
 }
 
@@ -71,6 +71,28 @@ void	ft_printmap(char **map)
 	}
 }
 
+void	ft_valid_map(char **map, int num, int len)
+{
+	int i;
+	int j;
+
+	i = 0;
+	while (map[i])
+	{
+		j = 0;
+		while (map[i][j])
+		{
+			if (j < len - 1)
+			{
+				if (map[0][j] != '1' || map[num - 1][j] != '1'
+				|| map[i][0] != '1' || map[i][len - 2] != '1')
+					ft_free_all(map, num);
+			}
+			j++;
+		}
+		i++;
+	}
+}
 int	ft_condition(t_elem *ent,  char  c)
 {
 	if (c == 'P')
@@ -79,12 +101,9 @@ int	ft_condition(t_elem *ent,  char  c)
 		ent->E += 1;
 	if (c == 'E')
 		ent->C += 1;
-	if (ent->P > 1 || ent->E > 1)
-		return (1);
-	if (ent->P < 1 || ent->E < 1)
-		return (1);
 	return (0);
 }
+
 void	ft_check_map(char	**map, t_data *smth)
 {
 	t_elem	ent;
@@ -97,21 +116,22 @@ void	ft_check_map(char	**map, t_data *smth)
 	ent.C = 0;
 	i = 0;
 	num = smth->size/smth->len;
-	while (num > 0)
+	ft_valid_map(map, num, smth->len);
+	while (map[i])
 	{
 		j = 0;
 		while (map[i][j])
 		{
-			if (ft_condition(&ent, map[i][j]) == 1)
-				ft_free_all(map, smth->size/smth->len);
+			ft_condition(&ent, map[i][j]);
 			j++;
 		}
 		i++;
-		num--;
 	}
+	if (ent.P != 1 || ent.E != 1)
+		ft_free_all(map, smth->size/smth->len);
 }
 
-void	ft_create_map(char **argv)
+t_data	ft_create_map(char **argv)
 {
 	char	**map;
 	t_data	smth;
@@ -127,4 +147,5 @@ void	ft_create_map(char **argv)
 	ft_check_map(map, &smth);
 	ft_printmap(map);
 	close(smth.fd);
+	return (smth);
 }
