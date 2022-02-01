@@ -6,11 +6,11 @@
 #    By: agallipo <agallipo@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/12/01 12:16:29 by agallipo          #+#    #+#              #
-#    Updated: 2022/02/01 11:58:54 by agallipo         ###   ########.fr        #
+#    Updated: 2022/02/01 16:08:27 by agallipo         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS = srcs/so_long.c  srcs/map.c srcs/enemy.c
+SRCS = srcs/so_long.c  srcs/create_map.c srcs/fill_map.c srcs/movements.c
 
 OBJS =  ${SRCS:.c=.o}
 
@@ -32,7 +32,7 @@ ${NAME}: ${OBJS}
 	${CC} ${FLAGS} libft.a ${OBJS} -I ${INCLUDES} -o ${NAME}
 
 %.o: %.c
-	${CC} ${FLAGS} -I ${INCLUDES} -c $< -o $@
+	${CC} ${CFLAGS} -I ${INCLUDES} -c $< -o $@
 
 
 clean:
