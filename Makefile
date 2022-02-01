@@ -6,11 +6,11 @@
 #    By: agallipo <agallipo@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/12/01 12:16:29 by agallipo          #+#    #+#              #
-#    Updated: 2022/01/27 16:54:21 by agallipo         ###   ########.fr        #
+#    Updated: 2022/02/01 11:58:54 by agallipo         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS = srcs/so_long.c  srcs/map.c
+SRCS = srcs/so_long.c  srcs/map.c srcs/enemy.c
 
 OBJS =  ${SRCS:.c=.o}
 
@@ -21,7 +21,7 @@ INCLUDES = includes/
 LIBFTDIR = libft/
 NAME = so_long
 CC = gcc
-FLAGS =  -g -lmlx -framework OpenGL -framework AppKit
+FLAGS = -lmlx -framework OpenGL -framework AppKit
 RM = rm -f
 
 all: 	${NAME}

@@ -6,7 +6,7 @@
 /*   By: agallipo <agallipo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/01 18:38:24 by agallipo          #+#    #+#             */
-/*   Updated: 2022/01/27 18:14:32 by agallipo         ###   ########.fr       */
+/*   Updated: 2022/02/01 11:42:37 by agallipo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,20 +41,20 @@ int	ft_map_size(char **argv)
 	return (i);
 }
 
-void	ft_fill_map(char **map, t_map *smth)
+void	ft_fill_map(t_pointers *mlx)
 {
 	int	i;
 
 	i = 0;
-	map[i]= smth->line;
-	while (map[i])
+	mlx->map_ref[i]= mlx->map.line;
+	while (mlx->map_ref[i])
 	{
-		if (ft_strlen(map[i]) != (size_t)smth->len)
-			ft_free_all(map, i);
+		if (ft_strlen(mlx->map_ref[i]) != (size_t)mlx->map.len)
+			ft_free_all(mlx->map_ref, i);
 		else
 		{
 			i++;
-			map[i]= get_next_line(smth->fd);
+			mlx->map_ref[i]= get_next_line(mlx->map.fd);
 		}
 	}
 }
@@ -93,60 +93,59 @@ void	ft_valid_map(char **map, int num, int len)
 		i++;
 	}
 }
-int	ft_condition(t_elem *ent,  char  c)
+int	ft_condition(t_pointers *mlx,  char  c)
 {
 	if (c == 'P')
-		ent->P += 1;
+		mlx->elem->P += 1;
 	if (c == 'E')
-		ent->E += 1;
-	if (c == 'E')
-		ent->C += 1;
+		mlx->elem->E += 1;
+	if (c == 'C')
+		mlx->elem->C += 1;
+	printf("C = %d\n", mlx->elem->C);
 	return (0);
 }
 
-void	ft_check_map(char	**map, t_map *smth)
+void	ft_check_map(t_pointers *mlx)
 {
-	t_elem	ent;
 	int		i;
 	int		j;
 	int		num;
 
-	ent.P = 0;
-	ent.E = 0;
-	ent.C = 0;
+	mlx->elem = ft_calloc(sizeof(t_elem), 1);
+	mlx->elem->P = 0;
+	mlx->elem->E = 0;
+	mlx->elem->C = 0;
 	i = 0;
-	num = smth->size/smth->len;
-	ft_valid_map(map, num, smth->len);
-	while (map[i])
+	num = mlx->map.size/mlx->map.len;
+	ft_valid_map(mlx->map_ref, num, mlx->map.len);
+	while (mlx->map_ref[i])
 	{
 		j = 0;
-		while (map[i][j])
+		while (mlx->map_ref[i][j])
 		{
-			ft_condition(&ent, map[i][j]);
+			ft_condition(mlx, mlx->map_ref[i][j]);
 			j++;
 		}
 		i++;
 	}
-	if (ent.P != 1 || ent.E != 1)
-		ft_free_all(map, smth->size/smth->len);
+	if (mlx->elem->P != 1 || mlx->elem->E != 1)
+		ft_free_all(mlx->map_ref, mlx->map.size/mlx->map.len);
 }
 
-t_map	ft_create_map(char **argv)
+t_map	ft_create_map(char **argv, t_pointers *mlx)
 {
-	t_map	map;
-
-	map.size = ft_map_size(argv);
-	if (map.size == 0)
+	mlx->map.size = ft_map_size(argv);
+	if (mlx->map.size == 0)
 		exit(0);
-	map.fd = open(argv[1],  O_RDONLY);
-	map.line = get_next_line(map.fd);
-	map.len = ft_strlen(map.line);
-	map.map = ft_calloc(sizeof(char *), map.size/map.len + 1);
-	ft_fill_map(map.map, &map);
-	ft_check_map(map.map, &map);
-	ft_printmap(map.map);
-	close(map.fd);
-	return (map);
+	mlx->map.fd = open(argv[1],  O_RDONLY);
+	mlx->map.line = get_next_line(mlx->map.fd);
+	mlx->map.len = ft_strlen(mlx->map.line);
+	mlx->map_ref = ft_calloc(sizeof(char *), mlx->map.size/mlx->map.len + 1);
+	ft_fill_map(mlx);
+	ft_check_map(mlx);
+	ft_printmap(mlx->map_ref);
+	close(mlx->map.fd);
+	return (mlx->map);
 }
 t_images	ft_init_images(void *mlx_ptr)
 {
@@ -157,24 +156,35 @@ t_images	ft_init_images(void *mlx_ptr)
 	img.background = mlx_xpm_file_to_image(mlx_ptr, "sprites/BRIK.xpm", &img.width, &img.height);
 	img.collect = mlx_xpm_file_to_image(mlx_ptr, "sprites/collectionable.xpm", &img.width, &img.height);
 	img.door = mlx_xpm_file_to_image(mlx_ptr, "sprites/puerta1.xpm", &img.width, &img.height);
+	img.enemy = mlx_xpm_file_to_image(mlx_ptr, "sprites/ANIM1F_1.xpm", &img.width, &img.height);
 	return (img);
 }
 
-void	ft_elements_images(s_pointers *mlx, t_images img, t_map map, int i, int j)
+void	ft_elements_images(t_pointers *mlx, t_images img, t_map map, int i, int j)
 {
-	if (map.map[i][j] == '1')
+	if (mlx->map_ref[i][j] == '1')
 		mlx_put_image_to_window(mlx->ptr, mlx->win, img.wall, j * 32, i * 32);
-	if (map.map[i][j] == '0')
+	if (mlx->map_ref[i][j] == '0')
 		mlx_put_image_to_window(mlx->ptr, mlx->win, img.background, j * 32, i * 32);
-	if (map.map[i][j] == 'P')
+	if (mlx->map_ref[i][j] == 'P')
+	{
 		mlx_put_image_to_window(mlx->ptr, mlx->win, img.character, j * 32, i * 32);
-	if (map.map[i][j] == 'E')
+		mlx->player_x = j;
+		mlx->player_y = i;
+	}
+	if (mlx->map_ref[i][j] == 'E')
 		mlx_put_image_to_window(mlx->ptr, mlx->win, img.door, j * 32, i * 32);
-	if (map.map[i][j] == 'C')
+	if (mlx->map_ref[i][j] == 'C')
 		mlx_put_image_to_window(mlx->ptr, mlx->win, img.collect, j * 32, i * 32);
+	if (mlx->map_ref[i][j] == 'N')
+	{
+		mlx_put_image_to_window(mlx->ptr, mlx->win, img.enemy, j * 32, i * 32);
+		mlx->enem_x = j;
+		mlx->enem_y = i;
+	}
 
 }
-void	ft_fill_map_with_images(t_map map, s_pointers *mlx)
+void	ft_fill_map_with_images(t_pointers *mlx)
 {
 	int			i;
 	int			j;
@@ -182,12 +192,12 @@ void	ft_fill_map_with_images(t_map map, s_pointers *mlx)
 
 	img = ft_init_images(mlx->ptr);
 	i = 0;
-	while (i < (map.size/map.len))
+	while (i < (mlx->map.size/mlx->map.len))
 	{
 		j = 0;
-		while (j < map.len)
+		while (j < mlx->map.len)
 		{
-			ft_elements_images(mlx, img, map, i, j);
+			ft_elements_images(mlx, img, mlx->map, i, j);
 			j++;
 		}
 		i++;
